@@ -24,6 +24,41 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+setup_go_path() {
+    export PATH="$INSTALL_DIR/bin:$PATH"
+    export PATH="$HOME/go/bin:$PATH"
+    export PATH="$HOME/.local/bin:$PATH"
+    export PATH="/usr/local/bin:$PATH"
+
+    if [ -f ~/.bashrc ]; then
+        source ~/.bashrc 2>/dev/null || true
+    fi
+    if [ -f ~/.zshrc ]; then
+        source ~/.zshrc 2>/dev/null || true
+    fi
+    if [ -f /etc/profile ]; then
+        source /etc/profile 2>/dev/null || true
+    fi
+}
+
+find_go_binary() {
+    local go_paths=(
+        "/usr/local/go/bin/go"
+        "$HOME/go/bin/go"
+        "$HOME/.local/bin/go"
+        "/usr/bin/go"
+        "/bin/go"
+    )
+
+    for path in "${go_paths[@]}"; do
+        if [ -x "$path" ]; then
+            echo "$path"
+            return 0
+        fi
+    done
+    return 1
+}
+
 detect_os() {
     if [[ "$OSTYPE" == "darwin"* ]]; then
         echo "macos"
@@ -66,16 +101,24 @@ compare_versions() {
 }
 
 check_go_installed() {
+    setup_go_path
+
+    local go_cmd=""
     if command -v go &> /dev/null; then
-        local current_version=$(go version 2>/dev/null | grep -oP 'go\K[0-9]+\.[0-9]+(\.[0-9]+)?' || echo "0")
-        if [ "$(compare_versions "$current_version" "$REQUIRED_GO_VERSION")" = "$REQUIRED_GO_VERSION" ]; then
-            return 0
-        else
-            log_warn "Go $current_version is installed but $REQUIRED_GO_VERSION+ is required"
-            return 1
-        fi
+        go_cmd="go"
+    elif [ -x "$(find_go_binary)" ]; then
+        go_cmd="$(find_go_binary)"
+    else
+        return 2
     fi
-    return 2
+
+    local current_version=$($go_cmd version 2>/dev/null | grep -oP 'go\K[0-9]+\.[0-9]+(\.[0-9]+)?' || echo "0")
+    if [ "$(compare_versions "$current_version" "$REQUIRED_GO_VERSION")" = "$REQUIRED_GO_VERSION" ]; then
+        return 0
+    else
+        log_warn "Go $current_version is installed but $REQUIRED_GO_VERSION+ is required"
+        return 1
+    fi
 }
 
 install_go_linux() {
@@ -187,6 +230,8 @@ main() {
     echo "============================================"
     echo ""
 
+    setup_go_path
+
     local go_status=$(check_go_installed)
 
     if [ $? -eq 0 ]; then
@@ -195,15 +240,21 @@ main() {
         log_warn "Go is not installed or version is insufficient"
         log_info "Installing Go ${REQUIRED_GO_VERSION}..."
         install_go
+        setup_go_path
+    fi
 
-        export PATH="$INSTALL_DIR/bin:$PATH"
+    local go_cmd="go"
+    if ! command -v go &> /dev/null; then
+        if [ -x "$(find_go_binary)" ]; then
+            go_cmd="$(find_go_binary)"
+        fi
     fi
 
     echo ""
     log_info "Installing laravel-dev..."
-    go install github.com/LC-jhony/laravel-dev@latest
+    $go_cmd install github.com/LC-jhony/laravel-dev@latest
 
-    local bin_dir=$(go env GOPATH)/bin
+    local bin_dir=$($go_cmd env GOPATH)/bin
 
     echo ""
     if [[ ":$PATH:" != *":$bin_dir:"* ]]; then
