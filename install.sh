@@ -234,20 +234,28 @@ main() {
 
     local go_status=$(check_go_installed)
 
+    local go_cmd=""
+
     if [ $? -eq 0 ]; then
         log_info "Go is already installed with the required version"
+        if command -v go &> /dev/null; then
+            go_cmd="go"
+        elif [ -x "$(find_go_binary)" ]; then
+            go_cmd="$(find_go_binary)"
+        fi
     else
         log_warn "Go is not installed or version is insufficient"
         log_info "Installing Go ${REQUIRED_GO_VERSION}..."
         install_go
         setup_go_path
-    fi
-
-    local go_cmd="go"
-    if ! command -v go &> /dev/null; then
         if [ -x "$(find_go_binary)" ]; then
             go_cmd="$(find_go_binary)"
         fi
+    fi
+
+    if [ -z "$go_cmd" ] || ! $go_cmd version &> /dev/null; then
+        log_error "Could not find Go binary"
+        exit 1
     fi
 
     echo ""
