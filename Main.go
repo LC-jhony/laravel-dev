@@ -9,7 +9,6 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -331,18 +330,18 @@ func showInstallerSelector() {
 	var options []string
 
 	for _, c := range components {
-		if !c.Installed {
-			options = append(options, c.Name)
-		}
+		// Always include all components for testing
+		options = append(options, c.Name)
 	}
 
-	if len(options) == 0 {
-		fmt.Println()
-		fmt.Println(uiSuccessStyle.Render("✨ Todos los componentes ya están instalados!"))
-		fmt.Println()
-		fmt.Println(uiInfoStyle.Render("Para actualizar, desinstala y vuelve a instalar."))
-		return
-	}
+	// For testing: always show the menu
+	// if len(options) == 0 {
+	// 	fmt.Println()
+	// 	fmt.Println(uiSuccessStyle.Render("✨ Todos los componentes ya están instalados!"))
+	// 	fmt.Println()
+	// 	fmt.Println(uiInfoStyle.Render("Para actualizar, desinstala y vuelve a instalar."))
+	// 	return
+	// }
 
 	var selectedOptions []string
 
@@ -354,12 +353,10 @@ func showInstallerSelector() {
 					getInstallOptions(components)...,
 				).
 				Value(&selectedOptions).
-				Description("Usa: Espacio=seleccionar, Enter=continuar, q=cancelar").
+				Description("Usa: Espacio=seleccionar, Flechas para navegar, Enter para continuar").
 				Limit(5),
 		),
-	).WithWidth(75).WithKeyMap(&huh.KeyMap{
-		Quit: key.NewBinding(key.WithKeys("q", "ctrl+c"), key.WithHelp("q", "cancelar")),
-	})
+	).WithWidth(75)
 
 	err := form.Run()
 	if err != nil {
@@ -579,13 +576,21 @@ func isInteractiveTerminal() bool {
 		return false
 	}
 
-	// Try to open /dev/tty, but don't fail if it doesn't exist
-	// Some environments might not have /dev/tty available
+	// Additional check: try to open /dev/tty
 	if _, err := os.Open("/dev/tty"); err != nil {
-		// If we can't open /dev/tty, check if we can at least read from stdin
-		// This allows the program to work in some containerized environments
-		return true
+		return false
 	}
 
 	return true
+}
+
+func getComponentDescription(name string) string {
+	descriptions := map[string]string{
+		"PHP":      "Intérprete de PHP",
+		"MariaDB":  "Base de datos MySQL",
+		"Node.js":  "Runtime de JavaScript",
+		"Composer": "Gestor de dependencias PHP",
+		"Valet":    "Entorno desarrollo Laravel",
+	}
+	return descriptions[name]
 }
