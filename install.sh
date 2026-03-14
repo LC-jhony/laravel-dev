@@ -26,11 +26,9 @@ go install github.com/LC-jhony/laravel-dev@latest
 if [ $? -eq 0 ]; then
     echo "✅ laravel-dev instalado correctamente"
     echo ""
-    echo "Ejecuta:"
-    echo "  laravel-dev"
+    echo "Ejecutando laravel-dev..."
     echo ""
-    echo "O:"
-    echo "  go run ."
+    go run .
 else
     echo "❌ Error al instalar laravel-dev"
     exit 1
