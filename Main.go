@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"laravel-dev/pkg"
+	"github.com/LC-jhony/laravel-dev/pkg"
 	"os"
 	"os/exec"
 	"regexp"
