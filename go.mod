@@ -1,14 +1,16 @@
-module laravel-dev
+module github.com/LC-jhony/laravel-dev
 
 go 1.25.8
 
-require github.com/charmbracelet/lipgloss v1.1.0
+require (
+	charm.land/bubbles/v2 v2.0.0
+	charm.land/huh/v2 v2.0.3
+	charm.land/lipgloss/v2 v2.0.1
+	github.com/charmbracelet/lipgloss v1.1.0
+)
 
 require (
-	charm.land/bubbles/v2 v2.0.0 // indirect
 	charm.land/bubbletea/v2 v2.0.2 // indirect
-	charm.land/huh/v2 v2.0.3 // indirect
-	charm.land/lipgloss/v2 v2.0.1 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/catppuccin/go v0.2.0 // indirect
@@ -32,7 +34,6 @@ require (
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
-	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.42.0 // indirect
 )
