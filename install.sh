@@ -12,8 +12,8 @@ fi
 
 # Verificar versión de Go
 GO_VERSION=$(go version | grep -oP 'go\K[0-9]+\.[0-9]+\.[0-9]+')
-if [[ "$GO_VERSION" < "1.25.8" ]]; then
-    echo "[INFO] Go versión $GO_VERSION detectada, requiere >= 1.25.8"
+if [[ "$GO_VERSION" < "1.22.2" ]]; then
+    echo "[INFO] Go versión $GO_VERSION detectada, requiere >= 1.22.2"
     exit 1
 fi
 

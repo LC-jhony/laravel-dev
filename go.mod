@@ -1,6 +1,6 @@
 module github.com/LC-jhony/laravel-dev
 
-go 1.25.8
+go 1.22.2
 
 require (
 	charm.land/bubbles/v2 v2.0.0
