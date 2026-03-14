@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"regexp"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"github.com/charmbracelet/huh"
@@ -313,7 +314,7 @@ func cleanVersion(version string) string {
 
 func showNonInteractiveMenu() {
 	fmt.Println()
-	fmt.Println(uiInfoStyle.Render("Ejecuta el programa en una terminal interactiva."))
+	fmt.Println(uiInfoStyle.Render("Ejecuta el programa en una terminal interactiva para usar el selector interactivo."))
 	fmt.Println()
 	fmt.Println(uiBoxStyle.Render("Comandos disponibles:"))
 	fmt.Println()
@@ -323,6 +324,8 @@ func showNonInteractiveMenu() {
 	fmt.Println("  " + uiInfoStyle.Render("laravel-dev install composer - Instalar Composer"))
 	fmt.Println("  " + uiInfoStyle.Render("laravel-dev install valet   - Instalar Laravel Valet"))
 	fmt.Println("  " + uiInfoStyle.Render("laravel-dev install all     - Instalar todo"))
+	fmt.Println()
+	fmt.Println(uiInfoStyle.Render("O usa el modo interactivo: laravel-dev"))
 }
 
 func showInstallerSelector() {
@@ -330,21 +333,22 @@ func showInstallerSelector() {
 	var options []string
 
 	for _, c := range components {
-		// Always include all components for testing
-		options = append(options, c.Name)
+		if !c.Installed {
+			options = append(options, c.Name)
+		}
 	}
 
-	// For testing: always show the menu
-	// if len(options) == 0 {
-	// 	fmt.Println()
-	// 	fmt.Println(uiSuccessStyle.Render("✨ Todos los componentes ya están instalados!"))
-	// 	fmt.Println()
-	// 	fmt.Println(uiInfoStyle.Render("Para actualizar, desinstala y vuelve a instalar."))
-	// 	return
-	// }
+	if len(options) == 0 {
+		fmt.Println()
+		fmt.Println(uiSuccessStyle.Render("✨ Todos los componentes ya están instalados!"))
+		fmt.Println()
+		fmt.Println(uiInfoStyle.Render("Para actualizar, desinstala y vuelve a instalar."))
+		return
+	}
 
 	var selectedOptions []string
 
+	// Try to use huh for interactive selection
 	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewMultiSelect[string]().
@@ -365,8 +369,41 @@ func showInstallerSelector() {
 			fmt.Println(uiInfoStyle.Render("Operación cancelada."))
 			return
 		}
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		return
+		// If huh fails, fallback to simple menu
+		fmt.Println()
+		fmt.Println(uiInfoStyle.Render("Usando menú simple..."))
+		fmt.Println()
+
+		// Show simple menu
+		for i, c := range components {
+			if !c.Installed {
+				fmt.Printf("  %d. %s %s\n", i+1, c.Icon, c.Name)
+			}
+		}
+
+		fmt.Println()
+		fmt.Print("Selecciona los números (separados por comas): ")
+
+		var input string
+		fmt.Scanln(&input)
+
+		// Parse input
+		for _, numStr := range strings.Split(input, ",") {
+			numStr = strings.TrimSpace(numStr)
+			if num, err := strconv.Atoi(numStr); err == nil && num > 0 && num <= len(components) {
+				// Find the component at this index
+				idx := 0
+				for _, c := range components {
+					if !c.Installed {
+						if idx == num-1 {
+							selectedOptions = append(selectedOptions, c.Name)
+							break
+						}
+						idx++
+					}
+				}
+			}
+		}
 	}
 
 	if len(selectedOptions) == 0 {
@@ -566,19 +603,45 @@ func repeat(s string, count int) string {
 }
 
 func isInteractiveTerminal() bool {
-	stat, err := os.Stdin.Stat()
-	if err != nil {
+	// Check if we're running in a CI/CD environment or non-interactive shell
+	if os.Getenv("CI") != "" || os.Getenv("GITHUB_ACTIONS") != "" {
 		return false
 	}
 
 	// Check if stdin is a character device (terminal)
+	stat, err := os.Stdin.Stat()
+	if err != nil {
+		return false
+	}
 	if (stat.Mode() & os.ModeCharDevice) == 0 {
 		return false
 	}
 
-	// Additional check: try to open /dev/tty
-	if _, err := os.Open("/dev/tty"); err != nil {
+	// Check if stdout is also a terminal
+	stdoutStat, err := os.Stdout.Stat()
+	if err != nil {
 		return false
+	}
+	if (stdoutStat.Mode() & os.ModeCharDevice) == 0 {
+		return false
+	}
+
+	// Check if stderr is also a terminal
+	stderrStat, err := os.Stderr.Stat()
+	if err != nil {
+		return false
+	}
+	if (stderrStat.Mode() & os.ModeCharDevice) == 0 {
+		return false
+	}
+
+	// Try to open /dev/tty as a final check
+	if f, err := os.Open("/dev/tty"); err == nil {
+		f.Close()
+	} else {
+		// If we can't open /dev/tty, but stdin/stdout/stderr are terminals,
+		// we might still be in an interactive environment
+		// (e.g., some containerized environments)
 	}
 
 	return true
