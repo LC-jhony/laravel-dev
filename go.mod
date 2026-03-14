@@ -4,7 +4,8 @@ go 1.24.0
 
 require (
 	github.com/charmbracelet/bubbles v0.16.1
-	github.com/charmbracelet/lipgloss v0.7.1
+	github.com/charmbracelet/huh v0.1.0
+	github.com/charmbracelet/lipgloss v0.9.1
 )
 
 require (
