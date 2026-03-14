@@ -1,16 +1,10 @@
 module github.com/LC-jhony/laravel-dev
 
-go 1.24.2
+go 1.24.0
 
 require (
 	github.com/charmbracelet/bubbles v0.16.1
-	github.com/charmbracelet/huh v0.2.0
-	github.com/charmbracelet/lipgloss v0.9.1
-)
-
-replace (
-	github.com/charmbracelet/colorprofile => github.com/charmbracelet/colorprofile v0.1.11
-	github.com/charmbracelet/lipgloss => github.com/charmbracelet/lipgloss v0.7.1
+	github.com/charmbracelet/lipgloss v0.7.1
 )
 
 require (
@@ -20,6 +14,7 @@ require (
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/charmbracelet/bubbletea v0.25.0 // indirect
 	github.com/charmbracelet/glamour v0.6.0 // indirect
+	github.com/charmbracelet/x/exp/ordered v0.0.0-20231025135604-4a717d4fb812 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/containerd/console v1.0.4-0.20230313162750-1ae8d489ac81 // indirect
 	github.com/dlclark/regexp2 v1.10.0 // indirect

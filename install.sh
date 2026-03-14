@@ -58,36 +58,32 @@ if [[ "$GO_VERSION" < "1.22.2" ]]; then
 fi
 print_success "Versión de Go compatible"
 
-print_step "Preparando instalación de laravel-dev..."
+print_step "Clonando repositorio laravel-dev..."
 echo ""
 
-# Instalar el paquete
-print_step "Descargando e instalando laravel-dev..."
-go install github.com/LC-jhony/laravel-dev@latest
+# Clonar el repositorio
+TEMP_DIR=$(mktemp -d)
+cd "$TEMP_DIR"
 
-if [ $? -eq 0 ]; then
-    print_success "laravel-dev instalado correctamente"
-    echo ""
-    print_step "Iniciando aplicación..."
+if git clone https://github.com/LC-jhony/laravel-dev.git; then
+    print_success "Repositorio clonado correctamente"
+    cd laravel-dev
+    
+    # Verificar la versión de Go requerida
+    REQUIRED_GO=$(grep "^go " go.mod | awk '{print $2}')
+    print_step "Verificando versión de Go requerida ($REQUIRED_GO)..."
+    
+    # Ejecutar la aplicación
+    print_step "Iniciando laravel-dev..."
     echo ""
     sleep 1
     
-    # Ejecutar el binario instalado
-    GOPATH=$(go env GOPATH)
-    LARAVEL_DEV_BIN="$GOPATH/bin/laravel-dev"
+    go run .
     
-    if [ -f "$LARAVEL_DEV_BIN" ]; then
-        "$LARAVEL_DEV_BIN"
-    else
-        # Fallback: intentar con go run si el binario no existe
-        if [ -d "/home/crack/Sites/laravel-dev" ]; then
-            cd /home/crack/Sites/laravel-dev && go run .
-        else
-            print_error "No se pudo encontrar la aplicación"
-            exit 1
-        fi
-    fi
+    # Limpiar
+    cd /
+    rm -rf "$TEMP_DIR"
 else
-    print_error "Error al instalar laravel-dev"
+    print_error "Error al clonar el repositorio"
     exit 1
 fi
