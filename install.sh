@@ -71,7 +71,22 @@ if [ $? -eq 0 ]; then
     print_step "Iniciando aplicación..."
     echo ""
     sleep 1
-    go run .
+    
+    # Ejecutar el binario instalado
+    GOPATH=$(go env GOPATH)
+    LARAVEL_DEV_BIN="$GOPATH/bin/laravel-dev"
+    
+    if [ -f "$LARAVEL_DEV_BIN" ]; then
+        "$LARAVEL_DEV_BIN"
+    else
+        # Fallback: intentar con go run si el binario no existe
+        if [ -d "/home/crack/Sites/laravel-dev" ]; then
+            cd /home/crack/Sites/laravel-dev && go run .
+        else
+            print_error "No se pudo encontrar la aplicación"
+            exit 1
+        fi
+    fi
 else
     print_error "Error al instalar laravel-dev"
     exit 1
