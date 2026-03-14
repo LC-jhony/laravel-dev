@@ -73,7 +73,7 @@ func main() {
 }
 
 func showWelcomeUI() {
-	title := uiTitleStyle.Render("Laravel Dev Tools")
+	title := uiTitleStyle.Render("Laravel Dev Tools v1.0.1")
 	subtitle := uiSubtitleStyle.Render("Instalador de entorno de desarrollo")
 
 	sysInfo := lipgloss.JoinVertical(
