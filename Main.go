@@ -9,9 +9,9 @@ import (
 	"runtime"
 	"strings"
 
-	"charm.land/bubbles/v2/key"
-	"charm.land/huh/v2"
-	"charm.land/lipgloss/v2"
+	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/lipgloss"
 )
 
 var (
@@ -355,8 +355,7 @@ func showInstallerSelector() {
 				).
 				Value(&selectedOptions).
 				Description("Usa: Espacio=seleccionar, Enter=continuar, q=cancelar").
-				Limit(5).
-				Height(10),
+				Limit(5),
 		),
 	).WithWidth(75).WithKeyMap(&huh.KeyMap{
 		Quit: key.NewBinding(key.WithKeys("q", "ctrl+c"), key.WithHelp("q", "cancelar")),

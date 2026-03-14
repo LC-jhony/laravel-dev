@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"charm.land/huh/v2"
-	"charm.land/lipgloss/v2"
+	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/lipgloss"
 )
 
 func init() {
@@ -114,7 +114,7 @@ func ShowVersionSelector() error {
 		),
 		huh.NewGroup(
 			huh.NewMultiSelect[string]().
-				Title("Selecciona las extensiones de PHP").
+				Title("Selecciona las extensiones de PHP (Enter para confirmar)").
 				Options(
 					huh.NewOption("CLI", "cli").Selected(true),
 					huh.NewOption("Common", "common").Selected(true),
@@ -131,10 +131,7 @@ func ShowVersionSelector() error {
 					huh.NewOption("XML", "xml").Selected(true),
 					huh.NewOption("ZIP", "zip").Selected(true),
 				).
-				Value(&selectedExtensions).
-				TitleFunc(func() string {
-					return "Selecciona las extensiones de PHP (Enter para confirmar)"
-				}, &selectedVersion),
+				Value(&selectedExtensions),
 		),
 		huh.NewGroup(
 			huh.NewConfirm().
@@ -243,7 +240,7 @@ func askSudoPassword() (string, error) {
 				Title("Ingresa tu contraseña de sudo").
 				Placeholder("Password").
 				Value(&password).
-				EchoMode(huh.EchoModePassword).
+				Password(true).
 				Validate(func(str string) error {
 					if str == "" {
 						return fmt.Errorf("la contraseña no puede estar vacía")

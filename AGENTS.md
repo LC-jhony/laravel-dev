@@ -71,7 +71,7 @@ go mod tidy
 go list -m all
 
 # Update a dependency
-go get charm.land/huh/v2@latest
+go get github.com/charmbracelet/huh@v0.1.0
 ```
 
 ---
@@ -95,8 +95,8 @@ import (
     "strings"
     
     // Third-party packages (alphabetical)
-    "charm.land/huh/v2"
-    "charm.land/lipgloss/v2"
+    "github.com/charmbracelet/huh"
+    "github.com/charmbracelet/lipgloss"
 )
 ```
 
@@ -173,10 +173,10 @@ laravel-dev/
 
 ## Key Libraries
 
-- **charm.land/lipgloss/v2** - Terminal styling
-- **charm.land/huh/v2** - Interactive forms/selects
-- **charm.land/bubbles/v2** - TUI components
-- **charm.land/bubbletea/v2** - TUI framework
+- **github.com/charmbracelet/lipgloss** - Terminal styling (v0.9.1)
+- **github.com/charmbracelet/huh** - Interactive forms/selects (v0.1.0)
+- **github.com/charmbracelet/bubbles** - TUI components (v0.16.1)
+- **github.com/charmbracelet/bubbletea** - TUI framework (v0.25.0)
 
 ---
 

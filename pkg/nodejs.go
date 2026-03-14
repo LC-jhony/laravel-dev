@@ -6,8 +6,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"charm.land/huh/v2"
-	"charm.land/lipgloss/v2"
+	"github.com/charmbracelet/huh"
+	"github.com/charmbracelet/lipgloss"
 )
 
 var nodeVersions = []struct {
