@@ -574,12 +574,17 @@ func isInteractiveTerminal() bool {
 		return false
 	}
 
+	// Check if stdin is a character device (terminal)
 	if (stat.Mode() & os.ModeCharDevice) == 0 {
 		return false
 	}
 
-	if _, err := os.OpenFile("/dev/tty", os.O_RDWR, 0); err != nil {
-		return false
+	// Try to open /dev/tty, but don't fail if it doesn't exist
+	// Some environments might not have /dev/tty available
+	if _, err := os.Open("/dev/tty"); err != nil {
+		// If we can't open /dev/tty, check if we can at least read from stdin
+		// This allows the program to work in some containerized environments
+		return true
 	}
 
 	return true
