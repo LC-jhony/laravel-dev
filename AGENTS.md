@@ -311,5 +311,5 @@ var boxStyle = lipgloss.NewStyle().
 
 ## Version Info
 
-- Go: 1.22.2
+- Go: 1.24.0
 - Module: laravel-dev
